@@ -84,7 +84,7 @@ $.fn.NamaEditor = function (_options) {
             var tempsaveDropdown = Designer.dropdown('<span class="fa fa-save"></span>').hoverMessage('임시저장');
             tempsaveDropdown.button('<span class="fa fa-save"></span>', '지금 임시저장').click((function () {
                 this.tempsaves.saveTempsave(this.editorOptions.docName, Date.now(), txtarea.value, this.editorOptions.section)
-                return toastr.success('임시저장 완료. <br>문단명 : ' + this.editorOptions.docName+(this.editorOptions.section ? '<br> 문단 번호 : ' + this.editorOptions.section : ''));
+                return toastr.success('임시저장 완료. <br>문단명 : ' + this.editorOptions.docName + (this.editorOptions.section ? '<br> 문단 번호 : ' + this.editorOptions.section : ''));
             }).bind(handlerEnv));
             tempsaveDropdown.button('<span class="fa fa-folder-open"></span>', '최근 임시저장 불러오기').click((function () {
                 var curSection = this.editorOptions.section;
@@ -98,7 +98,7 @@ $.fn.NamaEditor = function (_options) {
                 })
                 this.textProc.value(tempsaves[0].value);
                 var dateObj = new Date(tempsaves[0].timestamp);
-                return toastr.success('성공적으로 ' + dateObj.toString()  + '에 저장된 임시저장을 반영했습니다.')
+                return toastr.success('성공적으로 ' + dateObj.toString() + '에 저장된 임시저장을 반영했습니다.')
 
             }).bind(handlerEnv));
             //tempsaveDropdown.button('<span class="fa fa-trash" style="color: red;"></span>', '이 문단의 임시저장 전체 삭제');
@@ -107,8 +107,80 @@ $.fn.NamaEditor = function (_options) {
         }
 
         // set style
-        if(options.style)
+        if (options.style)
             e.setAttribute('style', options.style);
+
+        if (options.fastUpload && options.uploadFunc) {
+            // https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API/File_drag_and_drop
+            function whenUploaded(err, files, finisher) {
+                if (err) {
+                    toastr.error('파일 업로드중 무언가 오류가 발생했습니다.<br>' + br.message);
+                    $(e).prop('disabled', false);
+                    throw err;
+                }
+                for (var i = 0; i < files.length; i++) {
+                    var file = files[i];
+                    if (file.success) {
+                        toastr.success('파일 업로드 성공<br>파일 이름 : ' + file.filename + '<br>위키내 파일 문서 이름 : ' + file.docName)
+                        TextProc.selectionText(TextProc.selectionText() + '[[' + file.docName + ']]');
+                    } else {
+                        toastr.error('파일 업로드 실패<br>파일 이름 : ' + file.filename);
+                    }
+                }
+                $(e).prop('disabled', false);
+                if (typeof finisher !== 'undefined')
+                    finisher();
+            }
+            txtarea.addEventListener('drop', function (evt) {
+                evt.preventDefault();
+                var dt = evt.dataTransfer;
+                var files = [];
+                if (dt.items) {
+                    for (var i = 0; i < dt.items.length; i++) {
+                        if (dt.items[i].kind == "file") {
+                            var f = dt.items[i].getAsFile();
+                            files.push(f);
+                        }
+                    }
+                } else {
+                    for (var i = 0; i < dt.files.length; i++) {
+                        files.push(dt.files[i]);
+                    }
+                }
+                if (files.length !== 0) {
+                    $(e).prop('disabled', true);
+                    options.uploadFunc(files, whenUploaded)
+                }
+            });
+            txtarea.addEventListener('dragover', function (evt) {
+                evt.preventDefault();
+            });
+            txtarea.addEventListener('dragend', function (evt) {
+                var dt = evt.dataTransfer;
+                if (dt.items) {
+                    for (var i = 0; i < dt.items.length; i++) {
+                        dt.items.remove(i);
+                    }
+                } else {
+                    evt.dataTransfer.clearData();
+                }
+            });
+            Designer.button('<span class="fa fa-image"></span>').hoverMessage('이미지 업로드').click(function () {
+                var fileInput = $("input#namaeditor-file").length > 0 ? document.querySelector('input#namaeditor-file') : document.createElement("input");
+                fileInput.id = 'namaeditor-file';
+                fileInput.setAttribute("type", "file");
+                fileInput.setAttribute("multiple", "1");
+                fileInput.style.visibility = "hidden";
+                fileInput.setAttribute("accept", "image/*");
+                document.body.appendChild(fileInput);
+                fileInput.addEventListener('change', function (evt) {
+                    if(evt.target.files.length === 0) return;
+                    $(e).prop('disabled', true);
+                    options.uploadFunc(evt.target.files, whenUploaded);
+                });
+                fileInput.click();
+            });
+        }
 
         // insert NamaEditor
         var oldTextarea = e;
