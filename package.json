@@ -1,0 +1,22 @@
+{
+  "name": "namaeditor",
+  "version": "0.0.1",
+  "description": "editor for editing namumark, without wysiwyg support",
+  "main": "src/index.js",
+  "scripts": {
+    "build": "webpack -p",
+    "watch": "webpack --watch"
+  },
+  "keywords": [
+    "Namumark",
+    "Namuwiki",
+    "editor",
+    "wiki",
+    "markup"
+  ],
+  "author": "LiteHell",
+  "license": "MIT",
+  "devDependencies": {
+    "webpack": "^3.5.5"
+  }
+}
