@@ -96,6 +96,16 @@ $('textarea').NamaEditor({
 ## Available options
 for more options, see `src/defaultOptions.js` file
 
+## TO-DO
+[x] Temporary save
+[x] Markup helper
+[x] Image upload
+[ ] Better dropdown
+[ ] Shortcut
+[ ] Template inserting (document template)
+[ ] Template inserting (include macro)
+[ ] Macro inserting
+
 ## Copyrights
 Copyrights (C) 2017 LiteHell
 Distributed under MIT License.
