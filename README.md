@@ -22,10 +22,23 @@ npm run build
 
 ## Usage
 ```javascript
+// this will make editor.
 $('textarea').NamaEditor();
 
-// if you want options
-$('textarea').NamaEditor({style: 'height: 600px;'})
+// document name and section(null if editing whole document) sholud be specified
+$('textarea').NamaEditor({
+    docName: 'Lorem ipsum',
+    section: 2
+});
+
+// you can also specify additional options
+$('textarea').NamaEditor({
+    docName: 'Lorem ipsum',
+    section: 2,
+    style: 'height: 600px;'
+});
+
+// NOTE : NamaEditor must be called once, and options can't be changed after NamaEditor applied.
 ```
 
 ## Available options
