@@ -6,6 +6,7 @@
 ## Requirements
 - jQuery
 - FontAwesome
+- Toastr
 
 ## Build
 ```
